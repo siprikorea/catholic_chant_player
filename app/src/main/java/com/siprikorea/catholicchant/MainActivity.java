@@ -3,9 +3,12 @@ package com.siprikorea.catholicchant;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -46,10 +49,23 @@ public class MainActivity extends AppCompatActivity {
 
         // Play
         Button play = findViewById(R.id.play);
-        play.setOnClickListener(view -> model.play());
+        play.setOnClickListener(view -> {
+            model.play(number.getText().toString());
+
+            hideKeyboard();
+        });
 
         // Stop
         Button stop = findViewById(R.id.stop);
         stop.setOnClickListener(view -> model.stop());
+    }
+
+    /**
+     * Hide keyboard
+     */
+    private void hideKeyboard() {
+        View currentFocusedView = getCurrentFocus();
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(currentFocusedView.getWindowToken(), 0);
     }
 }

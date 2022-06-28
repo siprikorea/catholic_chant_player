@@ -22,7 +22,6 @@ public class ChantViewModel extends ViewModel {
 
     private ExecutorService mWorker = Executors.newSingleThreadExecutor();
     private MutableLiveData<Bitmap> mChantSheet = new MutableLiveData<>();
-    private Bitmap mChantSheetBitmap;
     private MediaPlayer mChantPlayer = new MediaPlayer();
 
     public LiveData<Bitmap> getChantSheet() {
@@ -31,18 +30,15 @@ public class ChantViewModel extends ViewModel {
 
     /**
      * Load
-     * @param number Chant number
+     * @param chantNumber Chant number
      */
-    public void load(String number) {
+    public void load(String chantNumber) {
         mWorker.execute(() -> {
             try {
-                String zeroPaddedNumber = getZeroPaddedNumber(number);
+                String zeroPaddedNumber = getZeroPaddedNumber(chantNumber);
                 InputStream in = new URL(BASE_CHANT_SHEET_URL + zeroPaddedNumber + ".jpg").openStream();
-                mChantSheetBitmap = BitmapFactory.decodeStream(in);
-
-                mChantPlayer.reset();
-                mChantPlayer.setDataSource(BASE_CHANT_MP3_URL + zeroPaddedNumber + ".mp3");
-                mChantPlayer.prepare();
+                Bitmap chantSheetBitmap = BitmapFactory.decodeStream(in);
+                mChantSheet.postValue(chantSheetBitmap);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -51,11 +47,15 @@ public class ChantViewModel extends ViewModel {
 
     /**
      * Play
+     * @param chantNumber Chant number
      */
-    public void play() {
+    public void play(String chantNumber) {
         mWorker.execute(() -> {
             try {
-                mChantSheet.postValue(mChantSheetBitmap);
+                String zeroPaddedNumber = getZeroPaddedNumber(chantNumber);
+                mChantPlayer.reset();
+                mChantPlayer.setDataSource(BASE_CHANT_MP3_URL + zeroPaddedNumber + ".mp3");
+                mChantPlayer.prepare();
                 mChantPlayer.start();
             } catch (Exception e) {
                 e.printStackTrace();
