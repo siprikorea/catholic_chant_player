@@ -65,7 +65,9 @@ public class MainActivity extends AppCompatActivity {
      */
     private void hideKeyboard() {
         View currentFocusedView = getCurrentFocus();
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(currentFocusedView.getWindowToken(), 0);
+        if (currentFocusedView != null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(currentFocusedView.getWindowToken(), 0);
+        }
     }
 }
