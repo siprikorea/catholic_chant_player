@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModel;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -102,6 +103,6 @@ public class ChantViewModel extends AndroidViewModel {
      * @return zero padded number
      */
     private String getZeroPaddedNumber(String number) {
-        return String.format("%03d", Integer.parseInt(number));
+        return String.format(Locale.KOREA, "%03d", Integer.parseInt(number));
     }
 }
