@@ -1,9 +1,14 @@
 package com.siprikorea.catholicchant;
 
+import android.app.Application;
+import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -16,27 +21,38 @@ import java.util.concurrent.Executors;
 /**
  * Chant ViewModel
  */
-public class ChantViewModel extends ViewModel {
-    private final String BASE_CHANT_SHEET_URL = "https://maria.catholic.or.kr/files/mp3/sungga/img/2012/2012040";
-    private final String BASE_CHANT_MP3_URL = "https://maria.catholic.or.kr/musicfiles/mp3/2004090";
+public class ChantViewModel extends AndroidViewModel {
+    private final ExecutorService mWorker = Executors.newSingleThreadExecutor();
+    private final MutableLiveData<Bitmap> mChantSheet = new MutableLiveData<>();
+    private final MediaPlayer mChantPlayer = new MediaPlayer();
+    private final Context mContext;
 
-    private ExecutorService mWorker = Executors.newSingleThreadExecutor();
-    private MutableLiveData<Bitmap> mChantSheet = new MutableLiveData<>();
-    private MediaPlayer mChantPlayer = new MediaPlayer();
+    public ChantViewModel(@NonNull Application application) {
+        super(application);
+        mContext = getApplication().getApplicationContext();
+    }
 
+    /**
+     * get chant sheet
+     *
+     * @return chant sheet
+     */
     public LiveData<Bitmap> getChantSheet() {
         return mChantSheet;
     }
 
     /**
-     * Load
-     * @param chantNumber Chant number
+     * load
+     *
+     * @param chantNumber chant numbe
      */
     public void load(String chantNumber) {
         mWorker.execute(() -> {
             try {
                 String zeroPaddedNumber = getZeroPaddedNumber(chantNumber);
-                InputStream in = new URL(BASE_CHANT_SHEET_URL + zeroPaddedNumber + ".jpg").openStream();
+                String fileName = "sheet/" + zeroPaddedNumber + ".jpg";
+
+                InputStream in = mContext.getAssets().open(fileName);
                 Bitmap chantSheetBitmap = BitmapFactory.decodeStream(in);
                 mChantSheet.postValue(chantSheetBitmap);
             } catch (Exception e) {
@@ -46,15 +62,18 @@ public class ChantViewModel extends ViewModel {
     }
 
     /**
-     * Play
-     * @param chantNumber Chant number
+     * play
+     *
+     * @param chantNumber chant number
      */
     public void play(String chantNumber) {
         mWorker.execute(() -> {
-            try {
-                String zeroPaddedNumber = getZeroPaddedNumber(chantNumber);
+            String zeroPaddedNumber = getZeroPaddedNumber(chantNumber);
+            String fileName = "mp3/" + zeroPaddedNumber + ".mp3";
+
+            try (AssetFileDescriptor afd = mContext.getAssets().openFd(fileName)) {
                 mChantPlayer.reset();
-                mChantPlayer.setDataSource(BASE_CHANT_MP3_URL + zeroPaddedNumber + ".mp3");
+                mChantPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
                 mChantPlayer.prepare();
                 mChantPlayer.start();
             } catch (Exception e) {
@@ -64,7 +83,7 @@ public class ChantViewModel extends ViewModel {
     }
 
     /**
-     * Stop
+     * stop
      */
     public void stop() {
         mWorker.execute(() -> {
@@ -77,7 +96,8 @@ public class ChantViewModel extends ViewModel {
     }
 
     /**
-     * Get zero padded number
+     * get zero padded number
+     *
      * @param number number
      * @return zero padded number
      */

@@ -14,7 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 
 /**
- * Main Activity
+ * main activity
  */
 public class MainActivity extends AppCompatActivity {
     @Override
