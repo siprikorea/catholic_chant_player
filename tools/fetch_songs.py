@@ -20,6 +20,11 @@ OUT = ROOT / "composeApp" / "src" / "commonMain" / "composeResources" / "files" 
 URL = "https://maria.catholic.or.kr/sungga/search/sungga_view.asp?ctxtIndex={}"
 LAST = 529
 
+# 사이트에 메타데이터가 비어 있어 악보 이미지를 보고 채운 값
+OVERRIDES = {
+    529: {"title": "이 땅에 빛을", "composer": "김은선", "firstLine": "이 겨레 깊은 밤 한줄기 빛에"},
+}
+
 
 def fetch(no: int, offline: bool) -> str:
     CACHE.mkdir(parents=True, exist_ok=True)
@@ -57,19 +62,20 @@ def main() -> None:
     songs, missing = [], []
     for no in range(1, LAST + 1):
         page = fetch(no, offline)
-        title = field(page, "성가 제목")
-        if not title:
-            missing.append(no)
-        songs.append({
+        song = {
             "no": no,
-            "title": title,
+            "title": field(page, "성가 제목"),
             "category": field(page, "전례별"),
             "type": field(page, "형식별"),
             "composer": field(page, "작곡가"),
             "firstLine": field(page, "첫 소절"),
             "hasSheet": no in sheets,
             "hasAudio": no in audios,
-        })
+        }
+        song.update({k: v for k, v in OVERRIDES.get(no, {}).items() if not song[k]})
+        if not song["title"]:
+            missing.append(no)
+        songs.append(song)
         if no % 50 == 0:
             print(f"{no}/{LAST}")
     OUT.parent.mkdir(parents=True, exist_ok=True)
