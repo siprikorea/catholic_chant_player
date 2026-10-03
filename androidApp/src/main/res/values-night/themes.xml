@@ -1,5 +1,0 @@
-<resources>
-    <style name="Theme.CatholicChant" parent="android:Theme.Material.NoActionBar">
-        <item name="android:windowBackground">#17110F</item>
-    </style>
-</resources>

@@ -55,8 +55,8 @@ fun MiniPlayer(
 
     Surface(
         shape = RoundedCornerShape(24.dp),
-        color = colors.surfaceContainerHigh,
-        shadowElevation = 10.dp,
+        color = colors.surfaceContainerLowest,
+        shadowElevation = 6.dp,
         modifier = modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
     ) {
         Column(Modifier.padding(start = 12.dp, end = 8.dp, top = 10.dp, bottom = 4.dp)) {

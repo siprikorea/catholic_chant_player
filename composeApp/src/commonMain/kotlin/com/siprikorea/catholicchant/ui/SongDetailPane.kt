@@ -140,7 +140,7 @@ fun SongDetailPane(
         Surface(
             shape = RoundedCornerShape(20.dp),
             color = Color.White, // 악보는 흰 종이 이미지라 다크 모드에서도 흰 바탕을 유지
-            shadowElevation = 3.dp,
+            shadowElevation = 1.dp,
             modifier = Modifier.weight(1f).fillMaxWidth().padding(16.dp),
         ) {
             SheetView(song, sheetSource)
@@ -170,7 +170,7 @@ private fun SheetView(song: Song, sheetSource: SheetSource) {
     Crossfade(load) { state ->
         when (state) {
             SheetLoad.Loading -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = Color(0xFF7A1F2B))
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
             SheetLoad.Missing -> Column(
                 Modifier.fillMaxSize(),
@@ -255,8 +255,8 @@ private fun ZoomableImage(bitmap: ImageBitmap, contentDescription: String) {
             Modifier.align(Alignment.BottomEnd).padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            val fabColor = Color(0xFFF6EFE5)
-            val iconColor = Color(0xFF7A1F2B)
+            val fabColor = Color(0xFFFDF3F4)
+            val iconColor = MaterialTheme.colorScheme.primary
             SmallFloatingActionButton(onClick = { zoomTo(scale * 1.4f) }, containerColor = fabColor, contentColor = iconColor) {
                 Icon(Icons.Rounded.ZoomIn, contentDescription = "확대")
             }

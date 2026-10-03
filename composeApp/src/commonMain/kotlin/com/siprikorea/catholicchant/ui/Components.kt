@@ -115,11 +115,11 @@ fun CrossLogo(size: Dp = 44.dp) {
         modifier = Modifier
             .size(size)
             .clip(RoundedCornerShape(size * 0.3f))
-            .background(Brush.linearGradient(listOf(Color(0xFF8E2433), Color(0xFF5E1520)))),
+            .background(Brush.linearGradient(listOf(Color(0xFFD06A7D), Color(0xFFA9425A)))),
         contentAlignment = Alignment.Center,
     ) {
         Canvas(Modifier.size(size * 0.56f)) {
-            val gold = Color(0xFFE6C47A)
+            val gold = Color(0xFFFFF4D6)
             val w = size.toPx() * 0.56f
             val bar = w * 0.2f
             drawRoundRect(gold, Offset((w - bar) / 2, 0f), Size(bar, w), CornerRadius(bar / 3))

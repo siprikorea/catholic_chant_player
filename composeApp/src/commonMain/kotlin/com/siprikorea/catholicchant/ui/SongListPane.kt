@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -154,7 +155,8 @@ private fun SearchField(query: String, onQueryChange: (String) -> Unit, autoFocu
     Surface(
         shape = RoundedCornerShape(20.dp),
         color = colors.surfaceContainerLowest,
-        shadowElevation = 2.dp,
+        shadowElevation = 1.dp,
+        border = BorderStroke(1.dp, colors.outlineVariant),
         modifier = modifier.fillMaxWidth(),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(start = 16.dp, end = 4.dp)) {
@@ -241,7 +243,8 @@ private fun SongRow(
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(18.dp),
-        color = if (selected) colors.primaryContainer.copy(alpha = 0.55f) else colors.surfaceContainerLowest,
+        color = if (selected) colors.primaryContainer else colors.surfaceContainerLowest,
+        border = BorderStroke(1.dp, if (selected) colors.primary.copy(alpha = 0.25f) else colors.outlineVariant),
         modifier = modifier.fillMaxWidth(),
     ) {
         Row(Modifier.padding(horizontal = 12.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -281,7 +284,7 @@ private fun SongRow(
                         )
                     } else {
                         IconButtonDefaults.filledTonalIconButtonColors(
-                            containerColor = colors.surfaceContainerHigh,
+                            containerColor = colors.primaryContainer,
                             contentColor = colors.primary,
                         )
                     },

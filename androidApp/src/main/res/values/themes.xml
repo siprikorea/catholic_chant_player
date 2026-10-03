@@ -1,5 +1,5 @@
 <resources>
     <style name="Theme.CatholicChant" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:windowBackground">#FBF7F0</item>
+        <item name="android:windowBackground">#FDFCFA</item>
     </style>
 </resources>
