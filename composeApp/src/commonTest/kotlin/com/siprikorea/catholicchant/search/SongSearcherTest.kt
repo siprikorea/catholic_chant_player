@@ -8,9 +8,9 @@ import kotlin.test.assertTrue
 class SongSearcherTest {
     private val songs = listOf(
         Song(1, "나는 믿나이다", firstLine = "나는 굳게 믿나이다"),
-        Song(2, "주 하느님 크시도다", firstLine = "주하느님 지으신 모든 세계"),
-        Song(12, "찬미 노래 부르며"),
-        Song(120, "주님의 기도"),
+        Song(2, "주 하느님 크시도다", composer = "Stuart K. Heine", firstLine = "주하느님 지으신 모든 세계"),
+        Song(12, "찬미 노래 부르며", composer = "최병철"),
+        Song(120, "주님의 기도", composer = "최병철"),
         Song(151, "주여 임하소서"),
         Song(269, "마리아의 노래"),
         Song(528, "축하합니다"),
@@ -68,6 +68,21 @@ class SongSearcherTest {
         val results = searcher.search("굳게 믿")
         assertEquals(1, results.first().song.no)
         assertTrue(results.first().firstLineRanges.isNotEmpty())
+    }
+
+    @Test
+    fun composerSearch() {
+        assertEquals(listOf(12, 120), numbers("최병철"))
+        assertEquals(listOf(12, 120), numbers("ㅊㅂㅊ"))
+        val result = searcher.search("heine").first()
+        assertEquals(2, result.song.no)
+        assertEquals(listOf(10..14), result.composerRanges)
+    }
+
+    @Test
+    fun titleRanksAboveComposer() {
+        val searcher = SongSearcher(listOf(Song(1, "다른 노래", composer = "주님"), Song(2, "주님의 기도")))
+        assertEquals(listOf(2, 1), searcher.search("주님").map { it.song.no })
     }
 
     @Test

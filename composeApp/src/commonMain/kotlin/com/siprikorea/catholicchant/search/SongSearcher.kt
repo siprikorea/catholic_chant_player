@@ -9,6 +9,8 @@ data class SearchResult(
     val titleRanges: List<IntRange> = emptyList(),
     /** 첫 소절에서 일치한 글자 범위 (원문 인덱스) */
     val firstLineRanges: List<IntRange> = emptyList(),
+    /** 작곡가에서 일치한 글자 범위 (원문 인덱스) */
+    val composerRanges: List<IntRange> = emptyList(),
 )
 
 /**
@@ -20,12 +22,19 @@ data class SearchResult(
  *  - 초성 일치 ("ㅈㅎㄴㄴ" → "주 하느님 크시도다")
  *  - 자모 서브시퀀스 (중간 글자 생략)
  *  - 자모 편집 거리 (오타 허용)
- *  첫 소절 일치는 제목보다 낮은 가중치를 받는다.
+ *  작곡가·첫 소절 일치는 제목보다 낮은 가중치를 받는다 (제목 > 작곡가 > 첫 소절).
  */
 class SongSearcher(songs: List<Song>) {
-    private class Entry(val song: Song, val title: IndexedText, val firstLine: IndexedText)
+    private class Entry(
+        val song: Song,
+        val title: IndexedText,
+        val composer: IndexedText,
+        val firstLine: IndexedText,
+    )
 
-    private val entries = songs.map { Entry(it, IndexedText(it.title), IndexedText(it.firstLine)) }
+    private val entries = songs.map {
+        Entry(it, IndexedText(it.title), IndexedText(it.composer), IndexedText(it.firstLine))
+    }
 
     fun search(query: String): List<SearchResult> {
         val trimmed = query.trim().removeSuffix("번").trim()
@@ -39,12 +48,14 @@ class SongSearcher(songs: List<Song>) {
 
         return entries.mapNotNull { entry ->
             val title = match(entry.title, q, choQuery)
+            val composer = match(entry.composer, q, choQuery)?.let { it.copy(score = it.score * 7 / 10) }
             val firstLine = match(entry.firstLine, q, choQuery)?.let { it.copy(score = it.score * 6 / 10) }
-            when {
-                title == null && firstLine == null -> null
-                firstLine == null || (title != null && title.score >= firstLine.score) ->
-                    SearchResult(entry.song, title!!.score, titleRanges = title.ranges)
-                else -> SearchResult(entry.song, firstLine.score, firstLineRanges = firstLine.ranges)
+            // 같은 점수면 제목 > 작곡가 > 첫 소절 순으로 우선
+            val best = listOfNotNull(title, composer, firstLine).maxByOrNull { it.score } ?: return@mapNotNull null
+            when (best) {
+                title -> SearchResult(entry.song, best.score, titleRanges = best.ranges)
+                composer -> SearchResult(entry.song, best.score, composerRanges = best.ranges)
+                else -> SearchResult(entry.song, best.score, firstLineRanges = best.ranges)
             }
         }.sortedWith(compareByDescending<SearchResult> { it.score }.thenBy { it.song.no })
     }

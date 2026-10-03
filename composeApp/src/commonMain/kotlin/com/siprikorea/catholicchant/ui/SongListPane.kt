@@ -28,6 +28,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.QueueMusic
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.MusicOff
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -175,7 +176,7 @@ private fun SearchField(query: String, onQueryChange: (String) -> Unit, autoFocu
                     Box(contentAlignment = Alignment.CenterStart) {
                         if (query.isEmpty()) {
                             Text(
-                                "번호, 제목, 초성으로 검색",
+                                "번호, 제목, 작곡가, 초성으로 검색",
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = colors.onSurfaceVariant.copy(alpha = 0.7f),
                                 maxLines = 1,
@@ -264,8 +265,23 @@ private fun SongRow(
                         CategoryLabel(song.category)
                         Spacer(Modifier.width(6.dp))
                     }
+                    // 작곡가로 찾은 경우 첫 소절 대신 작곡가를 강조해 보여준다
+                    val byComposer = result.composerRanges.isNotEmpty()
+                    if (byComposer) {
+                        Icon(
+                            Icons.Rounded.MusicNote,
+                            contentDescription = "작곡가",
+                            tint = colors.onSurfaceVariant,
+                            modifier = Modifier.size(14.dp),
+                        )
+                        Spacer(Modifier.width(2.dp))
+                    }
                     Text(
-                        text = highlighted(song.firstLine, result.firstLineRanges),
+                        text = if (byComposer) {
+                            highlighted(song.composer, result.composerRanges)
+                        } else {
+                            highlighted(song.firstLine, result.firstLineRanges)
+                        },
                         style = MaterialTheme.typography.bodySmall,
                         color = colors.onSurfaceVariant,
                         maxLines = 1,
@@ -326,7 +342,7 @@ private fun EmptyResult(query: String) {
             color = MaterialTheme.colorScheme.onSurface,
         )
         Text(
-            "번호(예: 2), 제목(예: 주 하느님), 초성(예: ㅈㅎㄴㄴ)으로 찾아보세요",
+            "번호(예: 2), 제목(예: 주 하느님), 작곡가(예: 최병철), 초성(예: ㅈㅎㄴㄴ)으로 찾아보세요",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(top = 6.dp),
